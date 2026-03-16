@@ -2,187 +2,98 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
+
 /**
- * Service untuk komunikasi langsung dengan RFID Reader HW-VX6330K v2
- * via TCP/IP socket menggunakan protokol binary UHFReader18
+ * Service untuk komunikasi dengan RFID Reader UHFReader09
+ * Menggunakan cache-based command queue:
+ * - Dashboard tulis perintah ke cache
+ * - Python register_reader.py polling perintah, eksekusi via COM port, tulis hasil ke cache
+ * - Dashboard polling hasil dari cache
  */
 class RfidReaderService
 {
-    private string $ip;
-    private int $port;
-    private int $timeout;
-
-    public function __construct()
-    {
-        $this->ip = env('RFID_READER_IP', '192.168.1.190');
-        $this->port = (int) env('RFID_READER_PORT', 6000);
-        $this->timeout = (int) env('RFID_READER_TIMEOUT', 3);
-    }
-
     /**
-     * CRC-16/MCRF4XX checksum calculation
+     * Queue command untuk dieksekusi oleh register_reader.py
+     * Non-blocking: langsung return CMD ID
      */
-    private function calculateChecksum(string $data): string
+    public function queueCommand(string $command, array $params = []): array
     {
-        $value = 0xFFFF;
-        for ($i = 0; $i < strlen($data); $i++) {
-            $value ^= ord($data[$i]);
-            for ($j = 0; $j < 8; $j++) {
-                if ($value & 0x0001) {
-                    $value = ($value >> 1) ^ 0x8408;
-                } else {
-                    $value = $value >> 1;
-                }
-            }
-        }
-        $crcLsb = $value & 0xFF;
-        $crcMsb = ($value >> 8) & 0xFF;
-        return chr($crcLsb) . chr($crcMsb);
-    }
+        $cmdId = uniqid('cmd_');
+        $cmd = [
+            'id' => $cmdId,
+            'command' => $command,
+            'params' => $params,
+            'queued_at' => now()->toDateTimeString(),
+        ];
 
-    /**
-     * Build command frame
-     */
-    private function buildCommand(int $cmd, array $data = []): string
-    {
-        $address = 0xFF;
-        $frameLen = 4 + count($data);
-
-        $frame = chr($frameLen) . chr($address) . chr($cmd);
-        foreach ($data as $byte) {
-            $frame .= chr($byte);
-        }
-        $frame .= $this->calculateChecksum($frame);
-        return $frame;
-    }
-
-    /**
-     * Send command and receive response via TCP socket
-     */
-    private function sendCommand(int $cmd, array $data = []): ?array
-    {
-        $frame = $this->buildCommand($cmd, $data);
-
-        $socket = @fsockopen($this->ip, $this->port, $errno, $errstr, $this->timeout);
-        if (!$socket) {
-            return ['error' => "Tidak bisa terhubung ke reader: $errstr ($errno)"];
-        }
-
-        stream_set_timeout($socket, $this->timeout);
-
-        // Send command
-        fwrite($socket, $frame);
-
-        // Read response length byte
-        $lenByte = fread($socket, 1);
-        if ($lenByte === false || strlen($lenByte) === 0) {
-            fclose($socket);
-            return ['error' => 'Reader tidak merespons (timeout)'];
-        }
-
-        $frameLength = ord($lenByte);
-        $remaining = '';
-        $bytesNeeded = $frameLength;
-
-        while (strlen($remaining) < $bytesNeeded) {
-            $chunk = fread($socket, $bytesNeeded - strlen($remaining));
-            if ($chunk === false || strlen($chunk) === 0) {
-                break;
-            }
-            $remaining .= $chunk;
-        }
-
-        fclose($socket);
-
-        $response = $lenByte . $remaining;
-
-        if (strlen($response) < 6) {
-            return ['error' => 'Response terlalu pendek'];
-        }
+        Cache::put('rfid_reader_command', $cmd, now()->addMinutes(1));
 
         return [
-            'length' => ord($response[0]),
-            'address' => ord($response[1]),
-            'command' => ord($response[2]),
-            'status' => ord($response[3]),
-            'data' => substr($response, 4, ord($response[0]) - 5),
-            'raw' => bin2hex($response),
+            'success' => true,
+            'cmd_id' => $cmdId,
+            'message' => 'Perintah dikirim ke antrean'
         ];
+    }
+
+    /**
+     * Ambil hasil eksekusi command
+     */
+    public function getCommandResult(string $cmdId): array
+    {
+        $result = Cache::get('rfid_reader_result');
+        if ($result && ($result['cmd_id'] ?? '') === $cmdId) {
+            // Hapus cache perintah jika sudah selesai diproses (opsional, tapi bagus untuk cleanup)
+            // Cache::forget('rfid_reader_command'); 
+            return $result;
+        }
+
+        return ['success' => false, 'status' => 'pending'];
     }
 
     /**
      * Set reader power (0-30)
-     * Semakin besar = jarak baca semakin jauh
      */
     public function setPower(int $power): array
     {
         if ($power < 0 || $power > 30) {
-            return ['error' => 'Power harus antara 0-30'];
+            return ['success' => false, 'error' => 'Power harus antara 0-30'];
         }
 
-        $response = $this->sendCommand(0x2F, [$power]);
-
-        if (isset($response['error'])) {
-            return $response;
-        }
-
-        return [
-            'success' => $response['status'] === 0x00,
-            'power' => $power,
-            'status' => $response['status'],
-            'message' => $response['status'] === 0x00
-                ? "Power berhasil diubah ke $power"
-                : "Gagal mengubah power (status: " . dechex($response['status']) . ")",
-        ];
+        return $this->queueCommand('set_power', ['power' => $power]);
     }
 
     /**
-     * Get reader information (address, firmware, power, etc.)
+     * Get reader info
      */
     public function getReaderInfo(): array
     {
-        $response = $this->sendCommand(0x21);
-
-        if (isset($response['error'])) {
-            return $response;
-        }
-
-        if ($response['status'] !== 0x00) {
-            return ['error' => 'Gagal mendapatkan info reader'];
-        }
-
-        $data = $response['data'];
-
-        return [
-            'success' => true,
-            'version' => sprintf('%d.%d', ord($data[0]), ord($data[1])),
-            'type' => ord($data[2]),
-            'protocol' => ord($data[3]),
-            'address' => ord($data[4]),
-            'power' => ord($data[5]),
-        ];
+        return $this->queueCommand('get_info');
     }
 
     /**
-     * Check if reader is reachable
+     * Cek status reader — cukup cek apakah Python script aktif
+     * Python heartbeat disimpan di cache setiap 3 detik
      */
     public function ping(): array
     {
-        $socket = @fsockopen($this->ip, $this->port, $errno, $errstr, 2);
-        if (!$socket) {
+        $heartbeat = Cache::get('rfid_reader_heartbeat');
+
+        if ($heartbeat) {
             return [
-                'online' => false,
-                'ip' => $this->ip,
-                'port' => $this->port,
-                'error' => $errstr,
+                'online' => true,
+                'ip' => $heartbeat['com_port'] ?? 'COM7',
+                'port' => $heartbeat['baud_rate'] ?? 9600,
+                'version' => $heartbeat['version'] ?? null,
+                'power' => $heartbeat['power'] ?? null,
             ];
         }
-        fclose($socket);
 
         return [
-            'online' => true,
-            'ip' => $this->ip,
-            'port' => $this->port,
+            'online' => false,
+            'ip' => 'COM7',
+            'port' => 9600,
+            'error' => 'register_reader.py tidak berjalan',
         ];
     }
 }

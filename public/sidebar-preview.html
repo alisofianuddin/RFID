@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID System — Sidebar Navigation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* =============================================
+           DESIGN TOKENS — LIGHT & DARK THEME
+        ============================================= */
+        :root,
+        [data-theme="dark"] {
+            --bg-base: #0d0d1a;
+            --bg-sidebar: #111120;
+            --bg-card: #181830;
+            --bg-hover: rgba(99, 102, 241, .12);
+            --bg-active: rgba(99, 102, 241, .20);
+            --bg-submenu: rgba(0, 0, 0, .18);
+            --border: rgba(255, 255, 255, .07);
+            --border-sb: rgba(255, 255, 255, .06);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --text-active: #a5b4fc;
+            --accent: #6366f1;
+            --accent-l: #818cf8;
+            --accent-gw: rgba(99, 102, 241, .35);
+            --accent-cyan: #22d3ee;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --shadow-sb: 4px 0 28px rgba(0, 0, 0, .45);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, .3);
+            --nav-w: 268px;
+            --hdr: 60px;
+            --r: 12px;
+            --r-sm: 8px;
+            color-scheme: dark;
+        }
+
+        [data-theme="light"] {
+            --bg-base: #f4f6fb;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: rgba(99, 102, 241, .07);
+            --bg-active: rgba(99, 102, 241, .13);
+            --bg-submenu: rgba(99, 102, 241, .04);
+            --border: rgba(0, 0, 0, .07);
+            --border-sb: rgba(0, 0, 0, .06);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --text-active: #4338ca;
+            --accent: #4f46e5;
+            --accent-l: #6366f1;
+            --accent-gw: rgba(79, 70, 229, .22);
+            --accent-cyan: #0891b2;
+            --accent-green: #16a34a;
+            --accent-red: #dc2626;
+            --shadow-sb: 4px 0 16px rgba(0, 0, 0, .08);
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, .07);
+            color-scheme: light;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            transition: background .3s, color .3s;
+        }
+
+        body {
+            display: flex;
+        }
+
+        /* =============================================
+           SIDEBAR
+        ============================================= */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--nav-w);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-sb);
+            box-shadow: var(--shadow-sb);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            transition: width .3s cubic-bezier(.4, 0, .2, 1), background .3s, box-shadow .3s;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 74px;
+        }
+
+        /* Brand */
+        .sb-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            height: var(--hdr);
+            border-bottom: 1px solid var(--border-sb);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-l));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 17px;
+            box-shadow: 0 0 18px var(--accent-gw);
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            overflow: hidden;
+            transition: opacity .2s, max-width .3s;
+            max-width: 200px;
+        }
+
+        .brand-text h2 {
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .brand-text small {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            display: block;
+        }
+
+        .sidebar.collapsed .brand-text {
+            opacity: 0;
+            max-width: 0;
+        }
+
+        /* Profile */
+        .sb-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 13px 18px;
+            border-bottom: 1px solid var(--border-sb);
+            overflow: hidden;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .avatar .dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 9px;
+            height: 9px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            border: 2px solid var(--bg-sidebar);
+        }
+
+        .profile-info {
+            overflow: hidden;
+            transition: opacity .2s, max-width .3s;
+            max-width: 200px;
+        }
+
+        .profile-info b {
+            font-size: 12.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: block;
+        }
+
+        .profile-info small {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .profile-info {
+            opacity: 0;
+            max-width: 0;
+        }
+
+        /* Nav */
+        .sb-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 8px 0;
+        }
+
+        .sb-nav::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sb-nav::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        /* Category */
+        .nav-cat {
+            padding: 14px 18px 5px;
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.3px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: opacity .2s;
+        }
+
+        .sidebar.collapsed .nav-cat {
+            opacity: 0;
+        }
+
+        /* Nav Item */
+        .nav-item {
+            margin: 1px 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 10px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            white-space: nowrap;
+            user-select: none;
+            transition: background .18s, color .18s;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--bg-active);
+            color: var(--text-active);
+            font-weight: 600;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 55%;
+            background: var(--accent-l);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .ni {
+            width: 30px;
+            min-width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            background: transparent;
+            transition: background .18s;
+            flex-shrink: 0;
+        }
+
+        .nav-link:hover .ni,
+        .nav-link.active .ni {
+            background: rgba(99, 102, 241, .15);
+        }
+
+        .nl {
+            flex: 1;
+            transition: opacity .2s;
+        }
+
+        .sidebar.collapsed .nl {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .chev {
+            font-size: 10px;
+            color: var(--text-muted);
+            transition: transform .22s, opacity .2s;
+        }
+
+        .sidebar.collapsed .chev {
+            opacity: 0;
+        }
+
+        .nav-item.open>.nav-link .chev {
+            transform: rotate(90deg);
+        }
+
+        /* Badge */
+        .badge {
+            font-size: 9px;
+            font-weight: 700;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 6px;
+            transition: opacity .2s;
+        }
+
+        .sidebar.collapsed .badge {
+            opacity: 0;
+        }
+
+        /* Submenu */
+        .submenu {
+            display: none;
+            background: var(--bg-submenu);
+            border-radius: var(--r-sm);
+            margin: 1px 0;
+            overflow: hidden;
+        }
+
+        .nav-item.open>.submenu {
+            display: block;
+            animation: subIn .2s ease;
+        }
+
+        @keyframes subIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submenu .nav-link {
+            padding: 8px 10px 8px 46px;
+            font-size: 12.5px;
+            border-radius: 6px;
+        }
+
+        .submenu .ni {
+            width: 26px;
+            min-width: 26px;
+            height: 26px;
+            font-size: 11.5px;
+            border-radius: 6px;
+        }
+
+        .submenu .submenu .nav-link {
+            padding-left: 60px;
+        }
+
+        /* Tooltip (collapsed) */
+        .sidebar.collapsed .nav-link[data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: var(--r-sm);
+            white-space: nowrap;
+            z-index: 999;
+            box-shadow: var(--shadow-card);
+            pointer-events: none;
+        }
+
+        /* Footer */
+        .sb-footer {
+            padding: 10px 8px;
+            border-top: 1px solid var(--border-sb);
+            flex-shrink: 0;
+        }
+
+        /* Theme btn */
+        .theme-btn {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            width: 100%;
+            border-radius: var(--r-sm);
+            white-space: nowrap;
+            overflow: hidden;
+            transition: background .18s, color .18s;
+        }
+
+        .theme-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .pill {
+            margin-left: auto;
+            width: 36px;
+            min-width: 36px;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            position: relative;
+            transition: background .2s;
+        }
+
+        .pill::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: transform .2s, background .2s;
+        }
+
+        [data-theme="light"] .pill {
+            background: var(--accent);
+        }
+
+        [data-theme="light"] .pill::after {
+            transform: translateX(16px);
+            background: #fff;
+        }
+
+        .sidebar.collapsed .pill,
+        .sidebar.collapsed .theme-label {
+            opacity: 0;
+        }
+
+        .theme-label {
+            transition: opacity .2s;
+        }
+
+        /* Collapse btn */
+        .cb {
+            position: fixed;
+            top: 16px;
+            left: calc(var(--nav-w) - 14px);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-sb);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            z-index: 300;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+            transition: left .3s cubic-bezier(.4, 0, .2, 1), transform .3s, color .2s, box-shadow .2s;
+        }
+
+        .cb:hover {
+            color: var(--text-primary);
+            box-shadow: 0 0 14px var(--accent-gw);
+        }
+
+        .sidebar.collapsed~.cb {
+            left: 60px;
+            transform: rotate(180deg);
+        }
+
+        /* =============================================
+           MAIN
+        ============================================= */
+        .main {
+            margin-left: var(--nav-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left .3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .sidebar.collapsed~.main {
+            margin-left: 74px;
+        }
+
+        /* Topbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--hdr);
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            transition: background .3s;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bc-parent {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        .bc-sep {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .tb-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .online-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 13px;
+            background: rgba(34, 197, 94, .1);
+            border: 1px solid rgba(34, 197, 94, .25);
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, .5);
+            }
+
+            50% {
+                box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--r-sm);
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: background .2s, color .2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* Page Content */
+        .content {
+            flex: 1;
+            padding: 28px 24px;
+        }
+
+        /* Welcome card */
+        .welcome-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 32px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: background .3s, border .3s;
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-cyan));
+        }
+
+        .welcome-icon {
+            width: 64px;
+            height: 64px;
+            min-width: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-l));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 0 24px var(--accent-gw);
+        }
+
+        .welcome-text h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .welcome-text p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Menu Preview Cards */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 16px;
+        }
+
+        .menu-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 20px;
+            cursor: pointer;
+            transition: all .22s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-l);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, .12);
+        }
+
+        .menu-card .mc-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+
+        .mc-blue {
+            background: rgba(99, 102, 241, .15);
+            color: var(--accent-l);
+        }
+
+        .mc-cyan {
+            background: rgba(34, 211, 238, .15);
+            color: var(--accent-cyan);
+        }
+
+        .mc-green {
+            background: rgba(34, 197, 94, .15);
+            color: var(--accent-green);
+        }
+
+        .mc-orange {
+            background: rgba(251, 146, 60, .15);
+            color: #fb923c;
+        }
+
+        .mc-red {
+            background: rgba(239, 68, 68, .15);
+            color: var(--accent-red);
+        }
+
+        .mc-purple {
+            background: rgba(168, 85, 247, .15);
+            color: #a855f7;
+        }
+
+        .menu-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .menu-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .menu-card .mc-arrow {
+            position: absolute;
+            top: 20px;
+            right: 18px;
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: transform .2s, color .2s;
+        }
+
+        .menu-card:hover .mc-arrow {
+            transform: translateX(4px);
+            color: var(--accent-l);
+        }
+
+        /* Mobile hamburger */
+        .hamb {
+            display: none;
+            width: 34px;
+            height: 34px;
+            border-radius: var(--r-sm);
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: background .2s;
+        }
+
+        .hamb:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sb-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .55);
+            z-index: 199;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--nav-w) !important;
+                transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sb-overlay {
+                display: block;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .3s;
+            }
+
+            .sidebar.open+.cb+.sb-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .sidebar.open~.sb-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .main {
+                margin-left: 0 !important;
+            }
+
+            .cb {
+                display: none;
+            }
+
+            .hamb {
+                display: flex;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sb">
+
+        <!-- Brand -->
+        <div class="sb-brand">
+            <div class="brand-icon"><i class="fas fa-wifi"></i></div>
+            <div class="brand-text">
+                <h2>RFID System</h2>
+                <small>Management Panel v2.0</small>
+            </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="sb-profile">
+            <div class="avatar">
+                A<span class="dot"></span>
+            </div>
+            <div class="profile-info">
+                <b>Administrator</b>
+                <small>IT Functional Developer</small>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sb-nav">
+
+            <!-- ==== READER ==== -->
+            <div class="nav-cat">Reader</div>
+
+            <!-- 1. Register Reader -->
+            <div class="nav-item" id="m-register">
+                <div class="nav-link" onclick="toggle('m-register')" data-tip="Register Reader">
+                    <span class="ni"><i class="fas fa-id-card-clip"></i></span>
+                    <span class="nl">Register Reader</span>
+                    <i class="fas fa-chevron-right chev"></i>
+                </div>
+                <div class="submenu">
+
+                    <!-- Register Card (nested) -->
+                    <div class="nav-item" id="m-reg-card">
+                        <div class="nav-link" onclick="toggle('m-reg-card')" data-tip="Register Card">
+                            <span class="ni"><i class="fas fa-credit-card"></i></span>
+                            <span class="nl">Register Card</span>
+                            <i class="fas fa-chevron-right chev"></i>
+                        </div>
+                        <div class="submenu">
+                            <div class="nav-item">
+                                <a class="nav-link" href="#"
+                                    onclick="activate(this,'Pendaftaran Card','Register Card');return false;"
+                                    data-tip="Pendaftaran Card">
+                                    <span class="ni"><i class="fas fa-plus-circle"></i></span>
+                                    <span class="nl">Pendaftaran Card</span>
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link" href="#"
+                                    onclick="activate(this,'Card Terdaftar','Register Card');return false;"
+                                    data-tip="Card Terdaftar">
+                                    <span class="ni"><i class="fas fa-list-check"></i></span>
+                                    <span class="nl">Card Terdaftar</span>
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link" href="#"
+                                    onclick="activate(this,'Status Card','Register Card');return false;"
+                                    data-tip="Status Card">
+                                    <span class="ni"><i class="fas fa-toggle-on"></i></span>
+                                    <span class="nl">Status Card</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Setting Register -->
+                    <div class="nav-item">
+                        <a class="nav-link" href="#" onclick="activate(this,'Setting','Register Reader');return false;"
+                            data-tip="Setting Register">
+                            <span class="ni"><i class="fas fa-sliders"></i></span>
+                            <span class="nl">Setting</span>
+                        </a>
+                    </div>
+
+                    <!-- Audit Trail Register -->
+                    <div class="nav-item">
+                        <a class="nav-link" href="#"
+                            onclick="activate(this,'Audit Trail','Register Reader');return false;"
+                            data-tip="Audit Trail Register">
+                            <span class="ni"><i class="fas fa-scroll"></i></span>
+                            <span class="nl">Audit Trail</span>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 2. Scan Reader -->
+            <div class="nav-item" id="m-scan">
+                <div class="nav-link" onclick="toggle('m-scan')" data-tip="Scan Reader">
+                    <span class="ni"><i class="fas fa-satellite-dish"></i></span>
+                    <span class="nl">Scan Reader</span>
+                    <i class="fas fa-chevron-right chev"></i>
+                </div>
+                <div class="submenu">
+
+                    <!-- Live Scan Log -->
+                    <div class="nav-item">
+                        <a class="nav-link" href="#"
+                            onclick="activate(this,'Live Scan Log','Scan Reader');return false;"
+                            data-tip="Live Scan Log">
+                            <span class="ni"><i class="fas fa-tower-broadcast"></i></span>
+                            <span class="nl">Live Scan Log</span>
+                            <span class="badge" id="live-badge">LIVE</span>
+                        </a>
+                    </div>
+
+                    <!-- Setting Scan -->
+                    <div class="nav-item">
+                        <a class="nav-link" href="#" onclick="activate(this,'Setting','Scan Reader');return false;"
+                            data-tip="Setting Scan">
+                            <span class="ni"><i class="fas fa-sliders"></i></span>
+                            <span class="nl">Setting</span>
+                        </a>
+                    </div>
+
+                    <!-- Audit Trail Scan -->
+                    <div class="nav-item">
+                        <a class="nav-link" href="#" onclick="activate(this,'Audit Trail','Scan Reader');return false;"
+                            data-tip="Audit Trail Scan">
+                            <span class="ni"><i class="fas fa-scroll"></i></span>
+                            <span class="nl">Audit Trail</span>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ==== MONITORING ==== -->
+            <div class="nav-cat">Monitoring</div>
+
+            <!-- 3. Audit Trail Umum -->
+            <div class="nav-item">
+                <a class="nav-link" href="#" onclick="activate(this,'Audit Trail Umum');return false;"
+                    data-tip="Audit Trail Umum">
+                    <span class="ni"><i class="fas fa-clipboard-list"></i></span>
+                    <span class="nl">Audit Trail Umum</span>
+                </a>
+            </div>
+
+            <!-- ==== MANAJEMEN ==== -->
+            <div class="nav-cat">Manajemen</div>
+
+            <!-- 4. Profil -->
+            <div class="nav-item">
+                <a class="nav-link" href="#" onclick="activate(this,'Profil');return false;" data-tip="Profil">
+                    <span class="ni"><i class="fas fa-user-circle"></i></span>
+                    <span class="nl">Profil</span>
+                </a>
+            </div>
+
+            <!-- 5. Level Access -->
+            <div class="nav-item">
+                <a class="nav-link" href="#" onclick="activate(this,'Level Access');return false;"
+                    data-tip="Level Access">
+                    <span class="ni"><i class="fas fa-layer-group"></i></span>
+                    <span class="nl">Level Access</span>
+                </a>
+            </div>
+
+            <!-- 6. Role & Permission -->
+            <div class="nav-item">
+                <a class="nav-link" href="#" onclick="activate(this,'Role &amp; Permission');return false;"
+                    data-tip="Role Permission">
+                    <span class="ni"><i class="fas fa-shield-halved"></i></span>
+                    <span class="nl">Role &amp; Permission</span>
+                </a>
+            </div>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="sb-footer">
+            <!-- Theme -->
+            <button class="theme-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <span class="ni" id="themeIco"><i class="fas fa-moon"></i></span>
+                <span class="theme-label" id="themeLbl">Dark Mode</span>
+                <span class="pill"></span>
+            </button>
+
+            <!-- Logout -->
+            <div class="nav-item">
+                <a class="nav-link" href="#" data-tip="Logout" style="margin-top:2px;">
+                    <span class="ni" style="color:var(--accent-red);"><i class="fas fa-right-from-bracket"></i></span>
+                    <span class="nl" style="color:var(--accent-red);">Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Collapse Btn -->
+    <button class="cb" id="cb" onclick="toggleCollapse()" title="Toggle Sidebar">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="sb-overlay" id="overlay" onclick="closeMobile()"></div>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main" id="main">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="hamb" id="hamb" onclick="openMobile()"><i class="fas fa-bars"></i></button>
+                <div class="breadcrumb">
+                    <span class="bc-parent" id="bcParent"></span>
+                    <i class="fas fa-chevron-right bc-sep" id="bcSep" style="display:none;"></i>
+                    <span id="bcCurr">Dashboard</span>
+                </div>
+            </div>
+            <div class="tb-right">
+                <div class="online-pill"><span class="dot"></span>Reader Online</div>
+                <button class="icon-btn" title="Notifikasi"><i class="fas fa-bell"></i></button>
+                <button class="icon-btn" title="Full Screen" onclick="toggleFS()"><i class="fas fa-expand"
+                        id="fsIco"></i></button>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- Welcome Banner -->
+            <div class="welcome-card">
+                <div class="welcome-icon"><i class="fas fa-wifi"></i></div>
+                <div class="welcome-text">
+                    <h1>Selamat Datang, Administrator 👋</h1>
+                    <p>RFID Management System — Gunakan sidebar untuk navigasi menu. Mendukung tema <b>Light</b> &
+                        <b>Dark</b>,
+                        sidebar dapat <b>dilipat</b> (ikon tooltip aktif saat terlipat), dan menu memiliki submenu
+                        accordion.</p>
+                </div>
+            </div>
+
+            <!-- Menu Overview Cards -->
+            <div class="menu-grid">
+
+                <div class="menu-card" onclick="openMenu('m-register')">
+                    <div class="mc-icon mc-blue"><i class="fas fa-id-card-clip"></i></div>
+                    <i class="fas fa-arrow-right mc-arrow"></i>
+                    <h3>Register Reader</h3>
+                    <p>Daftarkan card, lihat daftar card terdaftar, atur setting, dan audit trail pendaftaran.</p>
+                </div>
+
+                <div class="menu-card" onclick="openMenu('m-scan')">
+                    <div class="mc-icon mc-cyan"><i class="fas fa-satellite-dish"></i></div>
+                    <i class="fas fa-arrow-right mc-arrow"></i>
+                    <h3>Scan Reader</h3>
+                    <p>Live scan log real-time, setting parameter scan, dan audit trail aktivitas scan.</p>
+                </div>
+
+                <div class="menu-card"
+                    onclick="activate(document.querySelector('[onclick*=Audit]'),'Audit Trail Umum')">
+                    <div class="mc-icon mc-green"><i class="fas fa-clipboard-list"></i></div>
+                    <i class="fas fa-arrow-right mc-arrow"></i>
+                    <h3>Audit Trail Umum</h3>
+                    <p>Log semua aktivitas sistem secara keseluruhan — lintas modul.</p>
+                </div>
+
+                <div class="menu-card">
+                    <div class="mc-icon mc-orange"><i class="fas fa-user-circle"></i></div>
+                    <i class="fas fa-arrow-right mc-arrow"></i>
+                    <h3>Profil</h3>
+                    <p>Kelola informasi profil akun, password, dan preferensi pengguna.</p>
+                </div>
+
+                <div class="menu-card">
+                    <div class="mc-icon mc-purple"><i class="fas fa-layer-group"></i></div>
+                    <i class="fas fa-arrow-right mc-arrow"></i>
+                    <h3>Level Access</h3>
+                    <p>Tentukan hierarki level akses pengguna dalam sistem RFID.</p>
+                </div>
+
+                <div class="menu-card">
+                    <div class="mc-icon mc-red"><i class="fas fa-shield-halved"></i></div>
+                    <i class="fas fa-arrow-right mc-arrow"></i>
+                    <h3>Role &amp; Permission</h3>
+                    <p>Atur role dan permission — kontrol akses menu dan fitur per peran.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================
+        // THEME
+        // ======================
+        const TK = 'rfid_theme';
+        function applyTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            document.getElementById('themeIco').innerHTML = t === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            document.getElementById('themeLbl').textContent = t === 'dark' ? 'Dark Mode' : 'Light Mode';
+            localStorage.setItem(TK, t);
+        }
+        function toggleTheme() { applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+        applyTheme(localStorage.getItem(TK) || 'dark');
+
+        // ======================
+        // COLLAPSE
+        // ======================
+        const CK = 'rfid_collapsed';
+        function toggleCollapse() {
+            const s = document.getElementById('sb');
+            s.classList.toggle('collapsed');
+            localStorage.setItem(CK, s.classList.contains('collapsed') ? '1' : '0');
+        }
+        if (localStorage.getItem(CK) === '1') document.getElementById('sb').classList.add('collapsed');
+
+        // ======================
+        // ACCORDION MENU
+        // ======================
+        function toggle(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const sb = document.getElementById('sb');
+            if (sb.classList.contains('collapsed')) {
+                sb.classList.remove('collapsed');
+                localStorage.setItem(CK, '0');
+            }
+            // Close siblings at same level
+            const parent = el.parentElement;
+            parent.querySelectorAll(':scope > .nav-item.open').forEach(s => { if (s !== el) s.classList.remove('open'); });
+            el.classList.toggle('open');
+        }
+
+        function openMenu(id) {
+            const sb = document.getElementById('sb');
+            if (sb.classList.contains('collapsed')) {
+                sb.classList.remove('collapsed');
+                localStorage.setItem(CK, '0');
+            }
+            const el = document.getElementById(id);
+            if (el && !el.classList.contains('open')) el.classList.add('open');
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ======================
+        // ACTIVE + BREADCRUMB
+        // ======================
+        function activate(el, page, parent) {
+            document.querySelectorAll('.nav-link.active').forEach(l => l.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const bp = document.getElementById('bcParent');
+            const bs = document.getElementById('bcSep');
+            const bc = document.getElementById('bcCurr');
+            if (parent) {
+                bp.textContent = parent;
+                bs.style.display = '';
+                bc.textContent = page;
+            } else {
+                bp.textContent = '';
+                bs.style.display = 'none';
+                bc.textContent = page;
+            }
+        }
+
+        // ======================
+        // MOBILE
+        // ======================
+        function openMobile() {
+            document.getElementById('sb').classList.add('open');
+            document.getElementById('overlay').style.opacity = '1';
+            document.getElementById('overlay').style.pointerEvents = 'auto';
+        }
+        function closeMobile() {
+            document.getElementById('sb').classList.remove('open');
+            document.getElementById('overlay').style.opacity = '0';
+            document.getElementById('overlay').style.pointerEvents = 'none';
+        }
+        function checkW() {
+            const h = document.getElementById('hamb');
+            h.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+        }
+        window.addEventListener('resize', checkW);
+        checkW();
+
+        // ======================
+        // FULLSCREEN
+        // ======================
+        function toggleFS() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                document.getElementById('fsIco').className = 'fas fa-compress';
+            } else {
+                document.exitFullscreen();
+                document.getElementById('fsIco').className = 'fas fa-expand';
+            }
+        }
+
+        // ======================
+        // LIVE BADGE BLINK
+        // ======================
+        const lb = document.getElementById('live-badge');
+        if (lb) setInterval(() => { lb.style.opacity = lb.style.opacity === '0.2' ? '1' : '0.2'; }, 900);
+    </script>
+</body>
+
+</html>

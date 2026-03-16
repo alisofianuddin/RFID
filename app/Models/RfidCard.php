@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RfidCard extends Model
 {
-    protected $fillable = ['uid', 'nama', 'status'];
+    protected $fillable = ['uid', 'bn', 'status'];
 
     public function logs(): HasMany
     {

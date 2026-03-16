@@ -27,10 +27,23 @@ class Reader:
             command: Command = Command(CMD_INVENTORY)
         self.__send_request(command)
 
-        response: Response = Response(self.__get_response())
+        raw = self.__get_response()
+        if raw is None:
+            return iter(())
+
+        try:
+            response: Response = Response(raw)
+        except (ValueError, IndexError) as e:
+            print(f"[DEBUG] Response parse error: {e}")
+            return iter(())
+
         data: bytes = response.data
 
-        if not data:
+        # Cek status error dari reader (status != 0x01 = error)
+        if response.status != 0x01 and response.status != 0x00:
+            return iter(())
+
+        if not data or len(data) < 2:
             return iter(())
 
         tag_count: int = data[0]
@@ -38,11 +51,19 @@ class Reader:
         n: int = 0
         pointer: int = 1
         while n < tag_count:
+            # Bounds check sebelum akses data
+            if pointer >= len(data):
+                break
             tag_len = int(data[pointer])
             tag_data_start = pointer + 1
             tag_main_start = tag_data_start
             tag_main_end = tag_main_start + tag_len
             next_tag_start = tag_main_end
+
+            # Pastikan data cukup panjang
+            if tag_main_end > len(data):
+                break
+
             tag = data[tag_data_start:tag_main_start] \
                   + data[tag_main_start:tag_main_end] + data[tag_main_end:next_tag_start]
             yield tag

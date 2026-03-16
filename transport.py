@@ -60,16 +60,29 @@ class TcpTransport(Transport):
 
 
 class SerialTransport(Transport):
-    def __init__(self, serial_port: str, baud_rate: int, timeout: int = 1) -> None:
-        self.serial = serial.Serial(serial_port, baud_rate,
-                                    timeout=timeout, write_timeout=timeout)
+    def __init__(self, serial_port: str, baud_rate: int, timeout: int = 2) -> None:
+        self.serial = serial.Serial(
+            port=serial_port,
+            baudrate=baud_rate,
+            timeout=timeout,
+            write_timeout=timeout,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE
+        )
+        self.serial.reset_input_buffer()
+        self.serial.reset_output_buffer()
         print(f"[Serial] Terhubung ke {serial_port} @ {baud_rate}bps")
 
     def read_bytes(self, length: int) -> bytes:
         return self.serial.read(length)
 
     def write_bytes(self, buffer: bytes) -> None:
+        import time
+        self.serial.reset_input_buffer()
         self.serial.write(buffer)
+        self.serial.flush()
+        time.sleep(0.05)  # Beri waktu HW memproses sebelum dibaca
 
     def close(self) -> None:
         self.serial.close()
