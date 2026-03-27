@@ -451,5 +451,62 @@ class RfidController extends Controller
         
         return response()->json(['success' => true, 'message' => 'Konfigurasi disimpan']);
     }
+
+    public function getScanMultiReaderConfig(): JsonResponse
+    {
+        $configs = [
+            [
+                'id' => 1,
+                'name' => 'Pintu Utama (Gate A)',
+                'ip' => '192.168.1.190',
+                'port' => 6000,
+                'baudRate' => 115200,
+                'timeCard' => 500,
+                'type' => 'Global Scan',
+                'status' => 'offline',
+                'power' => 15
+            ]
+        ];
+
+        if (\Illuminate\Support\Facades\Storage::disk('local')->exists('scan_readers.json')) {
+            $json = \Illuminate\Support\Facades\Storage::disk('local')->get('scan_readers.json');
+            $configs = json_decode($json, true) ?: $configs;
+        }
+
+        return response()->json(['success' => true, 'data' => $configs]);
+    }
+
+    public function saveScanMultiReaderConfig(Request $request): JsonResponse
+    {
+        $request->validate([
+            'readers' => 'present|array',
+            'readers.*.id' => 'required',
+            'readers.*.name' => 'required|string',
+            'readers.*.ip' => 'required|string',
+            'readers.*.port' => 'required',
+            'readers.*.baudRate' => 'required',
+            'readers.*.timeCard' => 'required',
+            'readers.*.type' => 'required|string',
+        ]);
+
+        $readers = $request->input('readers', []);
+        
+        \Illuminate\Support\Facades\Storage::disk('local')->put('scan_readers.json', json_encode($readers, JSON_PRETTY_PRINT));
+
+        // Optional: Sync ke backward-compatible single reader config (biar main.py yg lama masih jalan sementara)
+        if (count($readers) > 0) {
+            $first = $readers[0];
+            $legacyConfig = [
+                'ip' => $first['ip'],
+                'port' => (int) $first['port'],
+                'time' => (int) $first['timeCard'],
+                'power' => (int) ($first['power'] ?? 15),
+            ];
+            // Legacy config tetap di cache karena hanya jembatan sementara untuk main.py berjalan
+            \Illuminate\Support\Facades\Cache::forever('rfid_scan_reader_config', $legacyConfig);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Konfigurasi Multi-Reader berhasil disimpan permanen']);
+    }
 }
 

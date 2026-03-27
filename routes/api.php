@@ -43,4 +43,6 @@ Route::post('/rfid/scan-reader/command-result', [RfidController::class, 'postSca
 Route::post('/rfid/scan-reader/heartbeat', [RfidController::class, 'scanReaderHeartbeat']);
 Route::get('/rfid/scan-reader/config', [RfidController::class, 'getScanReaderConfig']);
 Route::post('/rfid/scan-reader/config', [RfidController::class, 'saveScanReaderConfig']);
+Route::get('/rfid/scan-reader/multi-config', [RfidController::class, 'getScanMultiReaderConfig']);
+Route::post('/rfid/scan-reader/multi-config', [RfidController::class, 'saveScanMultiReaderConfig']);
 

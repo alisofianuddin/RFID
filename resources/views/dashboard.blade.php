@@ -58,14 +58,14 @@
             document.documentElement.setAttribute('data-theme', t);
             const ico = document.getElementById('sbThemeIco');
             const lbl = document.getElementById('sbThemeLbl');
-            if(ico) ico.innerHTML = t === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
-            if(lbl) lbl.textContent = t === 'dark' ? 'Dark Mode' : 'Light Mode';
+            if (ico) ico.innerHTML = t === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            if (lbl) lbl.textContent = t === 'dark' ? 'Dark Mode' : 'Light Mode';
             localStorage.setItem(SB_THEME, t);
         }
         function sbTheme() { sbApplyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
         function sbCollapse() {
             const s = document.getElementById('sidebar');
-            if(!s) return;
+            if (!s) return;
             s.classList.toggle('collapsed');
             localStorage.setItem(SB_COLL, s.classList.contains('collapsed') ? '1' : '0');
         }
@@ -86,47 +86,47 @@
         }
         function openSbMobile() {
             const s = document.getElementById('sidebar');
-            if(s) s.classList.add('mob-open');
+            if (s) s.classList.add('mob-open');
             const o = document.getElementById('sbOverlay');
-            if(o) o.style.cssText = 'opacity:1;pointer-events:auto;';
+            if (o) o.style.cssText = 'opacity:1;pointer-events:auto;';
         }
         function closeSbMobile() {
             const s = document.getElementById('sidebar');
-            if(s) s.classList.remove('mob-open');
+            if (s) s.classList.remove('mob-open');
             const o = document.getElementById('sbOverlay');
-            if(o) o.style.cssText = 'opacity:0;pointer-events:none;';
+            if (o) o.style.cssText = 'opacity:0;pointer-events:none;';
         }
 
         let currentPage = 'page-dashboard';
         const pageLoaders = {
-            'page-dashboard': () => { if(window.loadStats) loadStats(); if(window.loadLogs) loadLogs(); },
-            'page-live-scan': () => { if(window.loadLogs) loadLogs(); },
-            'page-register-card': () => { if(window.loadRegisterCardTable) loadRegisterCardTable(); },
-            'page-register-setting': () => { if(window.loadReaderStatus) loadReaderStatus(); },
-            'page-scan-setting': () => { if(window.loadScanReaderStatus) loadScanReaderStatus(); },
-            'page-register-audit': () => { if(window.loadAuditReg) loadAuditReg(); },
-            'page-scan-audit': () => { if(window.loadAuditScan) loadAuditScan(); },
-            'page-audit-umum': () => { if(window.loadAuditUmum) loadAuditUmum(); }
+            'page-dashboard': () => { if (window.loadStats) loadStats(); if (window.loadLogs) loadLogs(); },
+            'page-live-scan': () => { if (window.loadLogs) loadLogs(); },
+            'page-register-card': () => { if (window.loadRegisterCardTable) loadRegisterCardTable(); },
+            'page-register-setting': () => { if (window.loadReaderStatus) loadReaderStatus(); },
+            'page-scan-setting': () => { if (window.loadScanReaderStatus) loadScanReaderStatus(); },
+            'page-register-audit': () => { if (window.loadAuditReg) loadAuditReg(); },
+            'page-scan-audit': () => { if (window.loadAuditScan) loadAuditScan(); },
+            'page-audit-umum': () => { if (window.loadAuditUmum) loadAuditUmum(); }
         };
         function showPage(pageId) {
             document.querySelectorAll('.page-view').forEach(p => p.style.display = 'none');
             const target = document.getElementById(pageId);
-            if(target) target.style.display = 'block';
+            if (target) target.style.display = 'block';
             currentPage = pageId;
             if (pageLoaders[pageId]) pageLoaders[pageId]();
         }
 
         // Apply theme immediately
         sbApplyTheme(localStorage.getItem(SB_THEME) || 'dark');
-        
+
         // Setup initial collapse on DOM load
         document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem(SB_COLL) === '1') {
                 const s = document.getElementById('sidebar');
-                if(s) s.classList.add('collapsed');
+                if (s) s.classList.add('collapsed');
             }
             const h = document.getElementById('hambBtn');
-            if(h) {
+            if (h) {
                 const cw = () => { h.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
                 window.addEventListener('resize', cw); cw();
             }
@@ -146,7 +146,7 @@
             --accent-purple: #8b5cf6;
             --text-primary: #f8fafc;
             --text-secondary: #e4e9efff;
-            --text-muted: #0e1013ff;
+            --text-muted: #94a3b8;
             --border: #334155;
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
@@ -167,7 +167,7 @@
             --accent-purple: #7c3aed;
             --text-primary: #0f172a;
             --text-secondary: #475569;
-            --text-muted: #94a3b8;
+            --text-muted: #64748b;
             --border: #d8dce1ff;
             --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
             --shadow-glow-blue: 0 0 15px rgba(37, 99, 235, 0.2);
@@ -236,11 +236,16 @@
 
         .card-header {
             padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: none;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(0,0,0,0.08);
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #ffffff;
+            border-radius: 16px 16px 0 0;
+        }
+        [data-theme="light"] .card-header {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
         }
         .card-header h2 {
             font-size: 16px;
@@ -248,8 +253,11 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            color: #ffffff;
         }
-        .card-header h2 i { color: var(--accent-blue); }
+        .card-header h2 i { color: #93c5fd; }
+        .card-header .btn { color: #ffffff; }
+        .card-header span { color: rgba(255,255,255,0.7) !important; }
         .card-body { padding: 20px 24px; flex: 1; }
 
         /* Live Scan Alert */
@@ -544,6 +552,106 @@
         @keyframes pgIn   { from { opacity: 0; transform: translateY(8px); }  to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse  { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.5); } 50% { box-shadow: 0 0 0 8px rgba(0,230,118,0); } }
         @keyframes smIn   { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scanSweep { 0% { transform: translateX(-150%) skewX(-20deg); } 100% { transform: translateX(250%) skewX(-20deg); } }
+        @keyframes imageScanner { 0% { top: -20px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 105%; opacity: 0; } }
+
+        .hero-scanner-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(99, 102, 241, 0.8);
+            box-shadow: 0 0 20px 8px var(--sb-glow);
+            animation: imageScanner 3.5s linear infinite;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .btn-scan-anim {
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+        .btn-scan-anim::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            animation: scanSweep 2.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* ===== COLLAPSED SIDEBAR FIX ===== */
+        .sidebar.collapsed .sb-brand {
+            justify-content: center;
+            padding: 0;
+        }
+        .sidebar.collapsed .sb-brand .sb-brand-icon {
+            margin-right: 0;
+        }
+        .sidebar.collapsed .sb-brand .sb-brand-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .sb-profile {
+            justify-content: center;
+            padding: 14px 0;
+        }
+        .sidebar.collapsed .sb-profile .sb-avatar {
+            margin-right: 0;
+        }
+        .sidebar.collapsed .sb-profile .sb-profile-info {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-lnk {
+            justify-content: center;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .sidebar.collapsed .nav-lnk .nl,
+        .sidebar.collapsed .nav-lnk .chev,
+        .sidebar.collapsed .nav-lnk .lv-badge {
+            display: none !important;
+        }
+        .sidebar.collapsed .nav-lnk .ni {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-cat {
+            display: none;
+        }
+
+        .sidebar.collapsed .submenu {
+            display: none !important;
+        }
+
+        .sidebar.collapsed .sb-footer {
+            padding: 12px 4px;
+        }
+        .sidebar.collapsed .theme-btn {
+            justify-content: center;
+            padding: 10px 0;
+        }
+        .sidebar.collapsed .theme-btn .t-lbl,
+        .sidebar.collapsed .theme-btn .t-pill {
+            display: none !important;
+        }
+        .sidebar.collapsed .theme-btn .ni {
+            margin: 0 auto;
+        }
+
+        .sidebar.collapsed .sb-footer .nav-lnk {
+            justify-content: center;
+            padding: 10px 0 !important;
+        }
+        .sidebar.collapsed .sb-footer .nav-lnk .nl {
+            display: none !important;
+        }
 
     </style>
 </head>
@@ -593,7 +701,7 @@
                         class="fas fa-chevron-right chev ml-auto text-[10px] transition-transform duration-300 opacity-60 group-[.collapsed]/sidebar:opacity-0 group-[.open]/item:rotate-90"></i>
                 </div>
                 <div
-                    class="submenu hidden flex-col bg-black/15 border-l border-border ml-9 pl-1 my-1 group-[.open]/item:flex animate-[smIn_.25s_ease]">
+                    class="submenu hidden flex-col bg-accent-blue/5 border-l border-border ml-9 pl-1 my-1 group-[.open]/item:flex animate-[smIn_.25s_ease]">
                     <div class="nav-item mb-0.5"><a
                             class="nav-lnk flex items-center px-5 py-[10px] text-text-secondary hover:text-text-primary hover:bg-white/5 cursor-pointer relative transition-colors duration-200 [&.active]:text-accent-blue [&.active]:bg-gradient-to-r [&.active]:from-accent-blue/10 [&.active]:to-transparent [&.active]:border-l-[3px] [&.active]:border-accent-blue [&.active]:pl-[17px]"
                             href="#"
@@ -631,7 +739,7 @@
                         class="fas fa-chevron-right chev ml-auto text-[10px] transition-transform duration-300 opacity-60 group-[.collapsed]/sidebar:opacity-0 group-[.open]/item:rotate-90"></i>
                 </div>
                 <div
-                    class="submenu hidden flex-col bg-black/15 border-l border-border ml-9 pl-1 my-1 group-[.open]/item:flex animate-[smIn_.25s_ease]">
+                    class="submenu hidden flex-col bg-accent-blue/5 border-l border-border ml-9 pl-1 my-1 group-[.open]/item:flex animate-[smIn_.25s_ease]">
                     <div class="nav-item mb-0.5"><a
                             class="nav-lnk flex items-center px-5 py-[10px] text-text-secondary hover:text-text-primary hover:bg-white/5 cursor-pointer relative transition-colors duration-200 [&.active]:text-accent-blue [&.active]:bg-gradient-to-r [&.active]:from-accent-blue/10 [&.active]:to-transparent [&.active]:border-l-[3px] [&.active]:border-accent-blue [&.active]:pl-[17px]"
                             href="#"
@@ -794,18 +902,53 @@
                  Default = page-live-scan (dashboard utama)
             ============================================================ -->
 
-            <!-- PAGE: Dashboard UTama (Blank/Welcome) -->
+            <!-- PAGE: Dashboard UTama (Welcome / Home) -->
             <div class="page-view" id="page-dashboard">
-                <div
-                    style="display:flex; flex-direction:column; align-items:center; justify-content:center; height: 60vh; text-align:center;">
-                    <div style="font-size: 64px; color: var(--text-muted); margin-bottom: 24px;">
-                        <i class="fas fa-wifi"></i>
+                <div class="card"
+                    style="padding:0; overflow:hidden; border:none; box-shadow:none; background:transparent; position:relative;">
+                    <!-- Hero Image Banner -->
+                    <div style="width: 100%; height: 380px; position: relative; overflow: hidden; border-radius:16px;">
+                        <div class="hero-scanner-line"></div>
+                        <img src="{{ asset('images/rfid_welcome.jpg') }}" alt="RFID System Overview"
+                            style="width: 100%; height: 100%; object-fit: cover; filter: blur(3px) brightness(0.9); transform: scale(1.02);">
+                        <!-- Gradient overlay on bottom edge to blend with card -->
+                        <div
+                            style="position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, var(--bg-primary), transparent); z-index: 6;">
+                        </div>
                     </div>
-                    <h2 style="font-size: 24px; color: var(--text-primary); margin-bottom: 12px;">Sistem RFID Management
-                    </h2>
-                    <p style="color: var(--text-secondary); max-width: 400px; line-height: 1.6;">Selamat datang di
-                        Sistem RFID. Silakan gunakan menu navigasi di sebelah kiri untuk mengakses fitur pendaftaran
-                        kartu, pemindaian, dan pengaturan reader HW-VX6330k v2.</p>
+
+                    <!-- Welcome Content -->
+                    <div
+                        style="padding: 0 40px 40px 40px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; z-index: 10;">
+                        <div
+                            style="width: 72px; height: 72px; border-radius: 18px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; margin-top: -46px; box-shadow: 0 8px 25px var(--sb-glow); border: 4px solid var(--bg-card);">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h1
+                            style="font-size: 30px; font-weight: 800; color: var(--text-primary); margin-top: 24px; margin-bottom: 14px; letter-spacing: -0.5px;">
+                            Sistem RFID Management</h1>
+                        <p
+                            style="color: var(--text-secondary); max-width: 650px; font-size: 16px; line-height: 1.7; margin-bottom: 32px;">
+                            Selamat datang di panel kontrol <strong>Sistem RFID</strong>. Gunakan navigasi di sebelah
+                            kiri untuk mengakses fitur pendaftaran kartu, pemindaian WIP secara real-time, dan manajemen
+                            pengaturan multi-reader dalam satu platform terpusat yang presisi.
+                        </p>
+
+                        <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; z-index: 10;">
+                            <button
+                                onclick="sbActive(document.querySelector('[data-tip=\'Live Scan Log\']'), 'Live Scan Log'); showPage('page-live-scan');"
+                                class="btn btn-primary btn-scan-anim"
+                                style="padding: 12px 28px; font-weight: 600; font-size: 15px;">
+                                <i class="fas fa-satellite-dish fa-fade" style="margin-right: 8px;"></i> Live Scan Log
+                            </button>
+                            <button
+                                onclick="sbActive(document.querySelector('[data-tip=\'Register Reader\']'), 'Register Reader'); showPage('page-register-card');"
+                                class="btn btn-primary btn-scan-anim"
+                                style="padding: 12px 28px; font-weight: 600; font-size: 15px;">
+                                <i class="fas fa-id-card fa-beat-fade" style="margin-right: 8px;"></i> Register Card
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1020,94 +1163,107 @@
                 </div>
             </div>
 
-            <!-- PAGE: Scan Setting -->
+            <!-- PAGE: Scan Setting (Multi-Reader Template) -->
             <div class="page-view" id="page-scan-setting" style="display:none;">
-                <div class="content-grid">
-                    <div class="card">
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <h2><i class="fas fa-network-wired"></i> Daftar Scan Reader</h2>
+                        <button class="btn btn-primary btn-sm" onclick="openReaderForm()">
+                            <i class="fas fa-plus"></i> Tambah Reader
+                        </button>
+                    </div>
+                    <div class="card-body" style="padding:0; overflow-x:auto;">
+                        <table class="log-table" style="min-width: 800px;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama / Lokasi</th>
+                                    <th>IP Address</th>
+                                    <th>Port</th>
+                                    <th>Status</th>
+                                    <th style="text-align:right;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="multiReaderTableBody">
+                                <!-- Data will be rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Template Modal / Inline Edit form hidden for later use -->
+                <div class="card" id="readerFormCardTemplate"
+                    style="display:none; border: 1px solid var(--accent-blue);">
+                    <div class="card-header" style="background: rgba(var(--accent-blue-rgb), 0.1);">
+                        <h2><i class="fas fa-edit"></i> <span id="readerFormTitle">Tambah Reader Baru</span></h2>
+                        <button class="btn btn-sm" style="background:transparent; color:var(--text-muted);"
+                            onclick="closeReaderForm()"><i class="fas fa-times"></i> Tutup</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-form">
+                            <input type="hidden" id="formReaderId" value="">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                <div class="form-group"><label>Nama / Lokasi Reader</label><input type="text"
+                                        id="formReaderName" placeholder="Misal: Pintu Masuk"></div>
+                                <div class="form-group"><label>Tipe Event / Arah</label>
+                                    <select id="formReaderType"
+                                        style="width:100%; padding:14px; background:var(--bg-primary); border:1px solid var(--border); border-radius:8px; color:var(--text-primary);">
+                                        <option value="Global Scan">Global Scan</option>
+                                        <option value="IN (Masuk)">IN (Masuk)</option>
+                                        <option value="OUT (Keluar)">OUT (Keluar)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>IP Address</label><input type="text" id="formReaderIp"
+                                        placeholder="192.168.1.xxx"></div>
+                                <div class="form-group"><label>Port</label><input type="number" id="formReaderPort"
+                                        placeholder="6000"></div>
+                                <div class="form-group"><label>Baud Rate</label><input type="number"
+                                        id="formReaderBaudRate" placeholder="115200" value="115200"></div>
+                                <div class="form-group"><label>Time Card (ms)</label><input type="number"
+                                        id="formReaderTimeCard" placeholder="500" value="500"></div>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveReaderForm()"
+                                style="margin-top:20px; width:100%;"><i class="fas fa-save"></i> Simpan
+                                Konfigurasi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Power Setting Modal (Hidden by Default) -->
+                <div id="powerModal" class="modal-overlay"
+                    style="display:none; position:fixed; top:0; left:0; width:100%; h-screen; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+                    <div class="card" style="width: 90%; max-width: 500px; animation: slideUp 0.3s ease;">
                         <div class="card-header">
-                            <h2><i class="fas fa-sliders"></i> Pengaturan Scan Reader</h2>
-                            <span style="font-size:12px;" id="readerStatusTextQ"><span
-                                    class="reader-status-dot offline"></span>Checking...</span>
+                            <h2><i class="fas fa-broadcast-tower"></i> Pengaturan Power <span id="powerModalReaderName"
+                                    style="font-weight:normal; font-size:12px; margin-left:8px; color:var(--accent-cyan);"></span>
+                            </h2>
+                            <button class="btn btn-sm" style="background:transparent; color:var(--text-muted);"
+                                onclick="closePowerModal()"><i class="fas fa-times"></i> Tutup</button>
                         </div>
                         <div class="card-body">
                             <div class="power-slider-container">
                                 <div class="power-slider-header">
                                     <div>
                                         <div class="power-label">Power / Jarak Baca</div>
-                                        <div class="power-value" id="powerDisplayQ">--</div>
+                                        <div class="power-value" id="modalPowerDisplay">15</div>
                                     </div>
                                     <div style="text-align:right;">
                                         <div class="power-label">Estimasi Jarak</div>
                                         <div style="font-size:16px;font-weight:600;color:var(--accent-cyan);"
-                                            id="distanceEstimateQ">--</div>
+                                            id="modalDistanceEstimate">~2.0m</div>
                                     </div>
                                 </div>
-                                <input type="range" min="0" max="30" value="15" class="power-slider" id="powerSliderQ"
-                                    oninput="updatePowerDisplay(this.value, 'Q')">
+                                <input type="range" min="0" max="30" value="15" class="power-slider"
+                                    id="modalPowerSlider" oninput="updateModalPower(this.value)">
                                 <div class="power-labels"><span>0 (Dekat)</span><span>15</span><span>30 (Jauh)</span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary" style="width:100%;margin-top:16px;"
-                                onclick="applyPower('Q')" id="btnApplyPowerQ"><i class="fas fa-check"></i> Terapkan
-                                Power</button>
-                            <div class="power-info" id="readerInfoGridQ">
-                                <div class="power-info-item">
-                                    <div class="info-label">IP Address</div>
-                                    <div class="info-value" id="readerIpQ">--</div>
-                                </div>
-                                <div class="power-info-item">
-                                    <div class="info-label">Port</div>
-                                    <div class="info-value" id="readerPortQ">--</div>
-                                </div>
-                                <div class="power-info-item">
-                                    <div class="info-label">Firmware</div>
-                                    <div class="info-value" id="readerFirmwareQ">--</div>
-                                </div>
-                                <div class="power-info-item">
-                                    <div class="info-label">Power Aktif</div>
-                                    <div class="info-value" id="readerCurrentPowerQ">--</div>
-                                </div>
-                            </div>
+                            <button class="btn btn-primary" style="width:100%;margin-top:24px;"
+                                onclick="applyReaderPower()"><i class="fas fa-check"></i> Terapkan Power</button>
                         </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2><i class="fas fa-network-wired"></i> Konfigurasi Koneksi</h2>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-form">
-                                <div class="form-group"><label>IP Address Reader</label><input type="text"
-                                        id="scanCfgIp" placeholder="192.168.1.100"></div>
-                                <div class="form-group"><label>Port</label><input type="number" id="scanCfgPort"
-                                        placeholder="6000"></div>
-                                <div class="form-group"><label>Time Card (ms)</label><input type="number"
-                                        id="scanCfgTime" placeholder="500" min="100" max="5000"></div>
-                                <div class="form-group"><label>Power / Jarak Baca</label><input type="number"
-                                        id="scanCfgPower" placeholder="15" min="0" max="30"></div>
-                                <button class="btn btn-primary" style="width:100%;"
-                                    onclick="saveScanConfig()" id="btnSaveScanCfg"><i class="fas fa-save"></i>
-                                    Simpan Setting</button>
-                            </div>
-                        </div>
-
-                        <!-- NEW DIAGNOSTIC CARD -->
-                        <div class="card" style="margin-top: 20px;">
-                            <div class="card-header" style="background: rgba(var(--accent-blue-rgb), 0.1); border-bottom: 1px solid var(--border);">
-                                <h2><i class="fas fa-microchip"></i> Diagnostik Hardware (Live)</h2>
-                                <button class="btn btn-primary btn-sm" onclick="loadScanReaderStatus()">
-                                    <i class="fas fa-sync"></i> Refresh Data
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 15px;">
-                                    Data di bawah ini merupakan respon mentah (raw data) yang diterima dari script Python <code>main.py</code> (Hardware Reader sebenarnya) yang mengabarkan status aslinya ke server. Jika status "Online" tetapi reader tidak merespon/membaca, perhatikan kemungkinan masalah jaringan lokal.
-                                </p>
-                                <pre id="diagnosticData" style="background: var(--bg-primary); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; color: var(--text-primary); border: 1px solid var(--border); overflow-x: auto; white-space: pre-wrap;">Menunggu data diagnostik...</pre>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
+
             </div>
             <!-- PAGE: Scan Audit Trail -->
             <div class="page-view" id="page-scan-audit" style="display:none;">
@@ -1658,8 +1814,21 @@
                     loadRegisterCardTable();
                     loadStats();
                 } else {
-                    const errors = json.errors ? Object.values(json.errors).flat().join(', ') : json.message;
-                    showToast(errors, 'error');
+                    let errors = json.errors ? Object.values(json.errors).flat().join(', ') : json.message;
+
+                    // Translate Laravel validation messages to Indonesian
+                    const errLower = errors.toLowerCase();
+                    if (errLower.includes('already been taken') || errLower.includes('duplicate')) {
+                        if (errLower.includes('uid') && errLower.includes('bn')) {
+                            errors = 'UID dan BN sudah terdaftar di sistem!';
+                        } else if (errLower.includes('uid')) {
+                            errors = 'UID sudah terdaftar di sistem!';
+                        } else if (errLower.includes('bn')) {
+                            errors = 'BN (Batch Number) sudah terdaftar!';
+                        }
+                    }
+
+                    showToast(errors || 'Gagal mendaftarkan card!', 'error');
                 }
             } catch (err) {
                 showToast('Gagal mendaftarkan card!', 'error');
@@ -1766,12 +1935,29 @@
                 });
             }
         }
-        
+
         async function loadScanReaderStatus() {
             try {
                 const res = await fetch(`${API_BASE}/rfid/scan-reader/status`);
                 const json = await res.json();
                 const isOnline = json.success && json.data.online;
+
+                // Sync status to multiReaders array
+                if (typeof multiReaders !== 'undefined') {
+                    let changed = false;
+                    multiReaders.forEach(r => {
+                        const onlineNow = isOnline && r.ip === json.data.ip && r.port == json.data.port;
+                        const newStatus = onlineNow ? 'online' : 'offline';
+                        if (r.status !== newStatus) {
+                            r.status = newStatus;
+                            changed = true;
+                        }
+                    });
+                    if (changed && typeof renderMultiReaders === 'function') {
+                        renderMultiReaders();
+                    }
+                }
+
                 const statusHtml = isOnline
                     ? '<span class="reader-status-dot online"></span>Online'
                     : '<span class="reader-status-dot offline"></span>Offline';
@@ -1787,19 +1973,19 @@
                         ['readerFirmwareQ', d.version ? 'v' + d.version : '--'],
                         ['readerCurrentPowerQ', d.power !== undefined ? d.power : '--'],
                     ];
-                    
+
                     setPairs.forEach(([id, val]) => {
                         const el = document.getElementById(id);
                         if (el) el.textContent = val;
                     });
-                    
-                    
+
+
                     if (d.power !== undefined) {
                         const slQ = document.getElementById('powerSliderQ');
                         if (slQ) { slQ.value = d.power; updatePowerDisplay(d.power, 'Q'); }
                     }
                 }
-                
+
                 // --- UPDATE DIAGNOSTICS UI ---
                 const diagEl = document.getElementById('diagnosticData');
                 if (diagEl) {
@@ -1809,16 +1995,16 @@
                     }
                 }
                 // -----------------------------
-                
+
             } catch (e) {
                 console.error('Scan Reader status error:', e);
                 const el = document.getElementById('readerStatusTextQ');
                 if (el) el.innerHTML = '<span class="reader-status-dot offline"></span>Error';
-                
+
                 const diagEl = document.getElementById('diagnosticData');
                 if (diagEl) diagEl.textContent = 'Terjadi kesalahan sistem JS saat parsing status:\n' + e.message;
             }
-            
+
             // Walaupun online/offline, load config yang tersimpan di server
             try {
                 const cfgRes = await fetch(`${API_BASE}/rfid/scan-reader/config`);
@@ -1833,15 +2019,15 @@
                     if (cfgPort) cfgPort.value = d.port;
                     if (cfgTime) cfgTime.value = d.time;
                     if (cfgPower) cfgPower.value = d.power;
-                    
+
                     // --- APPEND CONFIG TO DIAGNOSTICS ---
                     const diagEl = document.getElementById('diagnosticData');
                     if (diagEl && diagEl.textContent) {
-                         diagEl.textContent += '\n\n=== KONFIGURASI TERSIMPAN (CACHE SERVER) ===\n' + JSON.stringify(d, null, 2);
+                        diagEl.textContent += '\n\n=== KONFIGURASI TERSIMPAN (CACHE SERVER) ===\n' + JSON.stringify(d, null, 2);
                     }
                     // ------------------------------------
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         async function saveScanConfig() {
@@ -1849,11 +2035,11 @@
             const port = parseInt(document.getElementById('scanCfgPort').value);
             const time = parseInt(document.getElementById('scanCfgTime').value) || 500;
             const power = parseInt(document.getElementById('scanCfgPower').value);
-            
+
             const btn = document.getElementById('btnSaveScanCfg');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-            
+
             try {
                 const res = await fetch(`${API_BASE}/rfid/scan-reader/config`, {
                     method: 'POST',
@@ -1863,7 +2049,7 @@
                 const json = await res.json();
                 if (json.success) {
                     showToast('Konfigurasi Scan Reader berhasil disimpan!', 'success');
-                    
+
                     // Update slider/display power juga
                     const slQ = document.getElementById('powerSliderQ');
                     if (slQ) { slQ.value = power; updatePowerDisplay(power, 'Q'); }
@@ -2081,9 +2267,15 @@
             loadLogs();
             // Reader status hanya load sekali saat startup (tidak di-interval agar tidak lag)
             loadReaderStatus();
+            loadMultiReaders();
 
             // Polling log scan baru setiap 3 detik
             setInterval(loadLogs, 3000);
+
+            // Polling scan reader status (TCP/IP main.py) tiap 3 detik
+            setInterval(() => {
+                if (typeof loadScanReaderStatus === 'function') loadScanReaderStatus();
+            }, 3000);
 
             // Polling register scan setiap 3 detik (dari register_reader.py)
             setInterval(pollRegisterScan, 3000);
@@ -2091,6 +2283,190 @@
             // Refresh stats setiap 15 detik
             setInterval(loadStats, 15000);
         });
+    </script>
+    <script>
+        // Multi-Reader State (Loaded from Backend)
+        let multiReaders = [];
+
+        async function loadMultiReaders() {
+            try {
+                const res = await fetch(`${API_BASE}/rfid/scan-reader/multi-config`);
+                const json = await res.json();
+                if (json.success && json.data) {
+                    multiReaders = json.data;
+                    renderMultiReaders();
+                }
+            } catch (e) {
+                console.error('Failed fetching multi readers:', e);
+            }
+        }
+
+        async function saveMultiReadersToBackend() {
+            try {
+                await fetch(`${API_BASE}/rfid/scan-reader/multi-config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ readers: multiReaders })
+                });
+            } catch (e) {
+                console.error('Failed saving multi readers:', e);
+            }
+        }
+
+        function renderMultiReaders() {
+            const tbody = document.getElementById('multiReaderTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            if (multiReaders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Belum ada reader yang ditambahkan.</td></tr>';
+                return;
+            }
+
+            multiReaders.forEach((r, index) => {
+                const statusBadge = r.status === 'online'
+                    ? '<span class="badge badge-registered"><i class="fas fa-circle" style="font-size:8px; margin-right:4px;"></i>Online</span>'
+                    : '<span class="badge badge-inactive"><i class="fas fa-circle" style="font-size:8px; margin-right:4px;"></i>Offline</span>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${r.name}</strong><br><small style="color:var(--text-muted); font-size:11px;">${r.type}</small></td>
+                        <td><span style="font-family: monospace;">${r.ip}</span></td>
+                        <td>${r.port}<br><small style="color:var(--text-muted); font-size:11px;">Baud: ${r.baudRate}</small></td>
+                        <td>${statusBadge}</td>
+                        <td style="text-align:right;">
+                            <button class="btn btn-sm" style="background:var(--bg-secondary); color:var(--text-primary); margin-right:4px;" onclick="openPowerModal(${r.id})" title="Atur Power Jarak Baca"><i class="fas fa-broadcast-tower text-accent-cyan"></i></button>
+                            <button class="btn btn-sm" style="background:var(--bg-secondary); color:var(--text-primary); margin-right:4px;" onclick="openReaderForm(${r.id})" title="Edit Reader"><i class="fas fa-edit text-accent-blue"></i></button>
+                            <button class="btn btn-sm" style="background:var(--bg-secondary); color:var(--text-primary);" onclick="deleteReader(${r.id})" title="Hapus Reader"><i class="fas fa-trash text-accent-red"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openReaderForm(id = null) {
+            document.getElementById('readerFormCardTemplate').style.display = 'block';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+            if (id) {
+                document.getElementById('readerFormTitle').innerText = 'Edit Reader';
+                const reader = multiReaders.find(r => r.id === id);
+                document.getElementById('formReaderId').value = reader.id;
+                document.getElementById('formReaderName').value = reader.name;
+                document.getElementById('formReaderIp').value = reader.ip;
+                document.getElementById('formReaderPort').value = reader.port;
+                document.getElementById('formReaderBaudRate').value = reader.baudRate || '115200';
+                document.getElementById('formReaderTimeCard').value = reader.timeCard || '500';
+                document.getElementById('formReaderType').value = reader.type;
+            } else {
+                document.getElementById('readerFormTitle').innerText = 'Tambah Reader Baru';
+                document.getElementById('formReaderId').value = '';
+                document.getElementById('formReaderName').value = '';
+                document.getElementById('formReaderIp').value = '';
+                document.getElementById('formReaderPort').value = '6000';
+                document.getElementById('formReaderBaudRate').value = '115200';
+                document.getElementById('formReaderTimeCard').value = '500';
+                document.getElementById('formReaderType').value = 'Global Scan';
+            }
+        }
+
+        function closeReaderForm() {
+            document.getElementById('readerFormCardTemplate').style.display = 'none';
+        }
+
+        function saveReaderForm() {
+            const id = document.getElementById('formReaderId').value;
+            const name = document.getElementById('formReaderName').value;
+            const ip = document.getElementById('formReaderIp').value;
+            const port = document.getElementById('formReaderPort').value;
+            const baudRate = document.getElementById('formReaderBaudRate').value;
+            const timeCard = document.getElementById('formReaderTimeCard').value;
+            const type = document.getElementById('formReaderType').value;
+
+            if (!name || !ip || !port || !baudRate || !timeCard) {
+                showToast('Semua kolom wajib diisi!', 'error');
+                return;
+            }
+
+            if (id) {
+                // Edit
+                const reader = multiReaders.find(r => r.id == id);
+                reader.name = name;
+                reader.ip = ip;
+                reader.port = port;
+                reader.baudRate = baudRate;
+                reader.timeCard = timeCard;
+                reader.type = type;
+                showToast('Reader berhasil diupdate!', 'success');
+            } else {
+                // Add
+                multiReaders.push({
+                    id: Date.now(),
+                    name, ip, port, baudRate, timeCard, type, status: 'offline', power: 15
+                });
+                showToast('Reader baru berhasil ditambahkan!', 'success');
+            }
+
+            closeReaderForm();
+            renderMultiReaders();
+            saveMultiReadersToBackend();
+        }
+
+        function deleteReader(id) {
+            if (confirm('Yakin ingin menghapus reader ini?')) {
+                multiReaders = multiReaders.filter(r => r.id !== id);
+                showToast('Reader dihapus!', 'success');
+                renderMultiReaders();
+                saveMultiReadersToBackend();
+            }
+        }
+
+        // Power Modal Logic
+        let activePowerReaderId = null;
+        function openPowerModal(id) {
+            activePowerReaderId = id;
+            const reader = multiReaders.find(r => r.id === id);
+            document.getElementById('powerModalReaderName').innerText = `(${reader.name})`;
+            document.getElementById('modalPowerSlider').value = reader.power || 15;
+            updateModalPower(reader.power || 15);
+
+            const modal = document.getElementById('powerModal');
+            modal.style.display = 'flex';
+            // Simple animation
+            modal.style.opacity = '0';
+            setTimeout(() => modal.style.opacity = '1', 50);
+        }
+
+        function closePowerModal() {
+            document.getElementById('powerModal').style.display = 'none';
+        }
+
+        function updateModalPower(val) {
+            document.getElementById('modalPowerDisplay').textContent = val;
+            let est = "~1.0m";
+            if (val > 5) est = "~1.5m";
+            if (val > 10) est = "~2.0m";
+            if (val > 15) est = "~3.5m";
+            if (val > 20) est = "~5.0m";
+            if (val > 25) est = "> 6.0m";
+            document.getElementById('modalDistanceEstimate').textContent = est;
+        }
+
+        function applyReaderPower() {
+            const val = document.getElementById('modalPowerSlider').value;
+            if (activePowerReaderId) {
+                const reader = multiReaders.find(r => r.id === activePowerReaderId);
+                reader.power = val;
+                saveMultiReadersToBackend();
+            }
+            showToast('Power berhasil diterapkan ke reader!', 'success');
+            closePowerModal();
+        }
+
+        // Initialize table (now done in DOMContentLoaded via loadMultiReaders)
+        // document.addEventListener('DOMContentLoaded', () => { renderMultiReaders(); });
+
     </script>
 </body>
 

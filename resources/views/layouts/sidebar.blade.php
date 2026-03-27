@@ -288,6 +288,10 @@
             margin: 1px 8px;
         }
 
+        .sidebar.collapsed .nav-item {
+            margin: 1px 4px;
+        }
+
         .nav-link {
             display: flex;
             align-items: center;
@@ -304,6 +308,12 @@
             font-size: 13.5px;
             font-weight: 500;
             user-select: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 9px 0;
+            gap: 0;
         }
 
         .nav-link:hover {
@@ -354,12 +364,15 @@
 
         .nav-label {
             flex: 1;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, width 0.3s;
         }
 
         .sidebar.collapsed .nav-label {
             opacity: 0;
+            width: 0;
+            flex: 0;
             pointer-events: none;
+            overflow: hidden;
         }
 
         /* Chevron / Arrow */
@@ -370,7 +383,7 @@
         }
 
         .sidebar.collapsed .nav-chevron {
-            opacity: 0;
+            display: none;
         }
 
         .nav-item.open>.nav-link .nav-chevron {
@@ -391,7 +404,7 @@
         }
 
         .sidebar.collapsed .nav-badge {
-            opacity: 0;
+            display: none;
         }
 
         /* Submenu */
@@ -406,6 +419,10 @@
         .nav-item.open>.submenu {
             display: block;
             animation: submenuIn 0.22s ease;
+        }
+
+        .sidebar.collapsed .submenu {
+            display: none !important;
         }
 
         @keyframes submenuIn {
@@ -443,6 +460,10 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+        }
+
+        .sidebar.collapsed .sidebar-footer {
+            padding: 12px 4px;
         }
 
         /* Theme Toggle Button */
@@ -483,12 +504,28 @@
             background: transparent;
         }
 
+        .sidebar.collapsed .theme-toggle {
+            justify-content: center;
+            padding: 9px 0;
+            gap: 0;
+        }
+
         .sidebar.collapsed .theme-toggle .toggle-label {
-            opacity: 0;
+            display: none;
         }
 
         .toggle-label {
             transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .sidebar-footer .nav-link {
+            justify-content: center;
+            padding: 9px 0;
+            gap: 0;
+        }
+
+        .sidebar.collapsed .sidebar-footer .nav-label {
+            display: none;
         }
 
         /* Toggle switch pill */
@@ -525,7 +562,7 @@
         }
 
         .sidebar.collapsed .toggle-pill {
-            opacity: 0;
+            display: none;
         }
 
         /* Collapse Toggle Button */
